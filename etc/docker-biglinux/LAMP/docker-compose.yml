@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  db-lamp:  # Service for MariaDB
+    image: mariadb:stable  # MariaDB stable image
+    container_name: db-lamp  # Container name
+    restart: always  # Always restart in case of failures
+    environment:  # Environment variables for database configuration
+      MYSQL_ROOT_PASSWORD: bigdocker  # Root user password
+      MYSQL_DATABASE: biglinux  # Database name
+      MYSQL_USER: biglinux  # User name
+      MYSQL_PASSWORD: bigdocker  # User password
+    volumes:
+      - ${HOME}/Docker/LAMP/db:/var/lib/mysql  # Host directory mapping to container directory
+    networks:
+      big-net:  # Association to "big-net" network
+      
+  lamp:  # Service for PHP and Apache
+    image: php:stable-apache  # PHP with stable Apache image
+    container_name: lamp  # Container name
+    restart: always  # Always restart in case of failures
+    volumes:
+      - ${HOME}/Docker/LAMP/html:/var/www/html/  # Host directory mapping to container directory
+    ports:
+      - "8080:80"  # Mapping host port 8080 to container port 80 (Apache)
+      - "4343:43"  # Mapping host port 4343 to container port 43 (optional)
+    depends_on:
+      - db-lamp  # Dependency on db-lamp service
+    networks:
+      big-net:  # Association to "big-net" network
+
+networks:
+  big-net:
+    name: big-net  # Network name

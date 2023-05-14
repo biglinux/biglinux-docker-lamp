@@ -1,30 +1,43 @@
-## arg 1:  the new package version
-#pre_install() {
-	# do something here
-#}
+# File: biglinux-docker-lamp.install
 
-## arg 1:  the new package version
-#post_install() {
-    # do something here
-#}
+# Executed after package installation
+post_install() {
+	# Check if Docker is installed
+	if ! command -v docker >/dev/null 2>&1; then
+		echo "The Docker package is not installed. Please install it before continuing."
+		exit 1
+	fi
 
-## arg 2:  the old package version
-#pre_upgrade() {
-	# do something here
-#}
+	# Start the LAMP container using docker-compose
+    echo "Starting the LAMP container..."
 
-## arg 2:  the old package version
-#post_upgrade() {
-	#post_install
-#}
+    # Expand $SUDO_USER and execute docker-compose with eval
+    eval "HOME=/home/$SUDO_USER docker-compose -f /etc/docker-biglinux/lamp/docker-compose.yml up -d"
+    
+    # Set the correct owner and group for the Docker folder and its contents
+    echo "Setting correct permissions for Docker folder..."
+    chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/Docker
+    
+    # Symlink docker-compose.yml to Docker/LAMP folder
+    echo "Creating symlink to docker-compose.yml..."
+    ln -s /etc/docker-biglinux/lamp/docker-compose.yml /home/$SUDO_USER/Docker/lamp/docker-compose.yml
+}
 
-## arg 1:  the old package version
-#pre_remove() {
-	# do something here
-#}
+# Executed before package removal
+pre_remove() {
+	# Stop and remove the LAMP container
+	echo "Stopping and removing the LAMP container..."
+	docker-compose -f /etc/docker-biglinux/lamps/docker-compose.yml down
+	
+	# Remove symlink to docker-compose.yml in Docker/LAMP folder
+    echo "Removing symbolic link to docker-compose.yml..."
+    rm -f /home/$SUDO_USER/Docker/LAMP/docker-compose.yml
+}
 
-## arg 1:  the old package version
-#post_remove() {
-	# do something here
-#}
- 
+# Executed after package removal
+post_remove() {
+	# Remove the Docker image
+    echo "Removing the LAMP Docker image..."
+    docker rmi mariadb:stable
+    docker rmi php:stable-apache
+}
