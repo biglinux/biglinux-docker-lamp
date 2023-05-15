@@ -23,7 +23,7 @@ post_install() {
     ln -s /etc/docker-biglinux/lamp/docker-compose.yml /home/$SUDO_USER/Docker/LAMP/docker-compose.yml
     
     # Copy file index.php to Docker/LAMP folder
-    cp -f /etc/docker-biglinux/lamp/index.php /home/$SUDO_USER/Docker/LAMP/
+    cp -f /etc/docker-biglinux/lamp/index.php /home/$SUDO_USER/Docker/LAMP/html/
 }
 
 # Executed before package removal
