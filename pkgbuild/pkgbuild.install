@@ -14,16 +14,16 @@ post_install() {
     # Expand $SUDO_USER and execute docker-compose with eval
     eval "HOME=/home/$SUDO_USER docker-compose -f /etc/docker-biglinux/lamp/docker-compose.yml up -d"
     
-    # Set the correct owner and group for the Docker folder and its contents
-    echo "Setting correct permissions for Docker folder..."
-    chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/Docker
-    
     # Symlink docker-compose.yml to Docker/LAMP folder
     echo "Creating symlink to docker-compose.yml..."
     ln -s /etc/docker-biglinux/lamp/docker-compose.yml /home/$SUDO_USER/Docker/LAMP/docker-compose.yml
     
     # Copy file index.php to Docker/LAMP folder
     cp -f /etc/docker-biglinux/lamp/index.php /home/$SUDO_USER/Docker/LAMP/html/
+    
+    # Set the correct owner and group for the Docker folder and its contents
+    echo "Setting correct permissions for Docker folder..."
+    chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/Docker
 }
 
 # Executed before package removal
