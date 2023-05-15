@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   db-lamp:  # Service for MariaDB
-    image: mariadb:stable  # MariaDB stable image
+    image: mariadb:lts  # MariaDB stable image
     container_name: db-lamp  # Container name
     restart: always  # Always restart in case of failures
     environment:  # Environment variables for database configuration
@@ -16,7 +16,7 @@ services:
       big-net:  # Association to "big-net" network
       
   lamp:  # Service for PHP and Apache
-    image: php:stable-apache  # PHP with stable Apache image
+    image: php:apache  # PHP with stable Apache image
     container_name: lamp  # Container name
     restart: always  # Always restart in case of failures
     volumes:
