@@ -21,6 +21,9 @@ post_install() {
     # Symlink docker-compose.yml to Docker/LAMP folder
     echo "Creating symlink to docker-compose.yml..."
     ln -s /etc/docker-biglinux/lamp/docker-compose.yml /home/$SUDO_USER/Docker/LAMP/docker-compose.yml
+    
+    # Copy file index.php to Docker/LAMP folder
+    cp -f /etc/docker-biglinux/lamp/index.php /home/$SUDO_USER/Docker/LAMP/
 }
 
 # Executed before package removal
@@ -38,6 +41,6 @@ pre_remove() {
 post_remove() {
 	# Remove the Docker image
     echo "Removing the LAMP Docker image..."
-    docker rmi mariadb:stable
-    docker rmi php:stable-apache
+    docker rmi mariadb:lts
+    docker rmi php:apache
 }
