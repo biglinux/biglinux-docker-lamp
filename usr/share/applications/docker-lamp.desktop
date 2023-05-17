@@ -2,7 +2,7 @@
 Version=1.0
 Terminal=false
 Type=Application
-Name=LAMP
+Name=Linux Apache MySQL PHP
 Exec=/usr/bin/xdg-open http://localhost:8080
 Icon=/usr/share/icons/hicolor/scalable/apps/docker-lamp.svg
 Categories=Docker;
