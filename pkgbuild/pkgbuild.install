@@ -23,7 +23,7 @@ post_install() {
     
     # Set the correct owner and group for the Docker folder and its contents
     echo "Setting correct permissions for Docker folder..."
-    chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/Docker/LAMP/
+    chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/Docker/LAMP
 }
 
 # Executed before package removal
