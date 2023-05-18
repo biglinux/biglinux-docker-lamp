@@ -1,34 +1,76 @@
 version: "3.9"
 
 services:
-  db-lamp:  # Service for MariaDB
-    image: mariadb:lts  # MariaDB stable image
-    container_name: db-lamp  # Container name
-    restart: always  # Always restart in case of failures
-    environment:  # Environment variables for database configuration
-      MYSQL_ROOT_PASSWORD: bigdocker  # Root user password
-      MYSQL_DATABASE: biglinux  # Database name
-      MYSQL_USER: biglinux  # User name
-      MYSQL_PASSWORD: bigdocker  # User password
-    volumes:
-      - ${HOME}/Docker/LAMP/db:/var/lib/mysql  # Host directory mapping to container directory
-    networks:
-      big-net:  # Association to "big-net" network
-      
-  lamp:  # Service for PHP and Apache
-    image: php:apache  # PHP with stable Apache image
-    container_name: lamp  # Container name
-    restart: always  # Always restart in case of failures
-    volumes:
-      - ${HOME}/Docker/LAMP/html:/var/www/html/  # Host directory mapping to container directory
-    ports:
-      - "8080:80"  # Mapping host port 8080 to container port 80 (Apache)
-      - "4343:43"  # Mapping host port 4343 to container port 43 (optional)
-    depends_on:
-      - db-lamp  # Dependency on db-lamp service
-    networks:
-      big-net:  # Association to "big-net" network
+    # Service for MariaDB
+    db-lamp:  
+        # MariaDB Long Term Support (LTS) image
+        image: mariadb:lts  
+        
+        # Name of the container
+        container_name: db-lamp  
+        
+        # Always restart the container in case of failures
+        restart: always  
+        
+        # Environment variables for database configuration
+        environment:  
+            MYSQL_ROOT_PASSWORD: bigdocker  # Password for root user
+            MYSQL_DATABASE: biglinux  # Database name
+            MYSQL_USER: biglinux  # Database user name
+            MYSQL_PASSWORD: bigdocker  # Password for database user
+            
+        # Host directory mapping to container directory for persisting database data
+        volumes:
+            - ${HOME}/Docker/LAMP/db:/var/lib/mysql  
+        
+        # Associating with "big-net" network
+        networks:
+            big-net:  
 
+    # Service for PHP and Apache
+    lamp:  
+        # PHP image with stable Apache pre-installed
+        image: php:apache  
+
+        # Name of the container
+        container_name: lamp  
+        
+        # Always restart the container in case of failures
+        restart: always  
+        
+        # Host directory mapping to container directory for serving HTML files
+        volumes:
+            - ${HOME}/Docker/LAMP/html:/var/www/html/  
+
+        # Mapping host ports to container ports (Apache and optional port)
+        ports:
+            - "8080:80"  
+            - "4343:43"
+        
+        # Dependency on db-lamp service
+        depends_on:
+            - db-lamp  
+
+        # Resource limits for the service
+        deploy:
+            resources:
+                limits:
+                    cpus: '2'  # Limit CPU usage by the service to 2 cores
+                    memory: 2G  # Limit memory usage by the service to 2GB
+
+        # Health check configuration for the service
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://127.0.0.1:8200"]  # Use curl to access port 8200 to check the health
+            interval: 30s  # Time interval between each health check
+            timeout: 10s  # Maximum time a health check can take before considered a failure
+            retries: 6  # Number of consecutive failures before container considered unhealthy
+
+        # Associating with "big-net" network
+        networks:
+            big-net:  
+
+# Network configuration
 networks:
-  big-net:
-    name: big-net  # Network name
+    # Network name
+    big-net:
+        name: big-net
