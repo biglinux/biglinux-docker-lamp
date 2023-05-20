@@ -1,4 +1,5 @@
-# File: biglinux-docker-lamp.install
+# Get the current non-root user
+CURRENT_USER=$(who | awk 'NR==1{print $1}')
 
 # Executed after package installation
 post_install() {
@@ -11,24 +12,34 @@ post_install() {
 	# Start the LAMP container using docker-compose
     echo "Starting the LAMP container..."
 
-    # Expand $SUDO_USER and execute docker-compose with eval
-    eval "HOME=/home/$SUDO_USER docker-compose -f /etc/docker-biglinux/lamp/docker-compose.yml up -d"
+    # Expand $CURRENT_USER and execute docker-compose with eval
+    eval "HOME=/home/$CURRENT_USER docker-compose -f /etc/docker-biglinux/lamp/docker-compose.yml up -d"
     
     # Symlink docker-compose.yml to Docker/LAMP folder
     echo "Creating symlink to docker-compose.yml..."
-    ln -s /etc/docker-biglinux/lamp/docker-compose.yml /home/$SUDO_USER/Docker/LAMP/docker-compose.yml
+    ln -s /etc/docker-biglinux/lamp/docker-compose.yml /home/$CURRENT_USER/Docker/LAMP/docker-compose.yml
     
-    # Copy file index.html to Docker/SWS folder only if it doesn't exist
-    if [ ! -f /home/$SUDO_USER/Docker/LAMP/html/index.php ]; then
-        echo "Copying index.html to Docker/LAMP folder..."
-        cp -f /etc/docker-biglinux/lamp/index.php /home/$SUDO_USER/Docker/LAMP/html/
+    # Copy file index.php to Docker/LAMP folder only if it doesn't exist
+    cp -f /etc/docker-biglinux/lamp/index.php /home/$CURRENT_USER/Docker/LAMP/html/
+        
+    # Set the correct owner and group for the Docker folder and its contents
+    echo "Setting correct permissions for Docker folder..."
+    chown -R $CURRENT_USER:$CURRENT_USER /home/$CURRENT_USER/Docker/LAMP
+}
+
+# Upgrade package
+post_upgrade() {
+    # Copy file index.php to Docker/LAMP folder only if it doesn't exist
+    if [ ! -f /home/$CURRENT_USER/Docker/LAMP/html/index.php ]; then
+        echo "Copying index.php to Docker/LAMP folder..."
+        cp -f /etc/docker-biglinux/lamp/index.php /home/$CURRENT_USER/Docker/LAMP/html/
     else
-        echo "index.php already exists, skipping copy..."
+        echo "File index.php already exists, skipping copy..."
     fi
     
     # Set the correct owner and group for the Docker folder and its contents
     echo "Setting correct permissions for Docker folder..."
-    chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/Docker/LAMP
+    chown -R $CURRENT_USER:$CURRENT_USER /home/$CURRENT_USER/Docker/LAMP
 }
 
 # Executed before package removal
@@ -39,7 +50,7 @@ pre_remove() {
 	
 	# Remove symlink to docker-compose.yml in Docker/LAMP folder
     echo "Removing symbolic link to docker-compose.yml..."
-    rm -f /home/$SUDO_USER/Docker/LAMP/docker-compose.yml
+    rm -f /home/$CURRENT_USER/Docker/LAMP/docker-compose.yml
 }
 
 # Executed after package removal
