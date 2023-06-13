@@ -23,6 +23,19 @@ services:
         volumes:
             - ${HOME}/Docker/LAMP/db:/var/lib/mysql  
         
+        # Resource limits for the service
+        deploy:
+            resources:
+                limits:
+                    cpus: '2'  # Limit CPU usage by the service to 2 cores
+                    memory: 2G  # Limit memory usage by the service to 2GB
+
+        # Health check configuration for the service
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://127.0.0.1:3306"]  # Use curl to access port 8200 to check the health
+            interval: 30s  # Time interval between each health check
+            timeout: 10s  # Maximum time a health check can take before considered a failure
+            retries: 6  # Number of consecutive failures before container considered unhealthy
         # Associating with "big-net" network
         networks:
             big-net:  
@@ -60,7 +73,7 @@ services:
 
         # Health check configuration for the service
         healthcheck:
-            test: ["CMD", "curl", "-f", "http://127.0.0.1:8200"]  # Use curl to access port 8200 to check the health
+            test: ["CMD", "curl", "-f", "http://127.0.0.1:80"]  # Use curl to access port 8200 to check the health
             interval: 30s  # Time interval between each health check
             timeout: 10s  # Maximum time a health check can take before considered a failure
             retries: 6  # Number of consecutive failures before container considered unhealthy
