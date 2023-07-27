@@ -38,7 +38,7 @@ services:
             retries: 6  # Number of consecutive failures before container considered unhealthy
         # Associating with "big-net" network
         networks:
-            big-net:  
+            - lamp-net  
 
     # Service for PHP and Apache
     lamp:  
@@ -80,10 +80,10 @@ services:
 
         # Associating with "big-net" network
         networks:
-            big-net:  
+            - lamp-net
 
 # Network configuration
 networks:
     # Network name
-    big-net:
-        name: big-net
+    lamp-net:
+        name: lamp-net
